@@ -1,5 +1,6 @@
 import { prisma } from "@/app/lib/prisma"
 import { ListItem } from "../list-item"
+import { Task } from "@prisma/client"
 
 export type Item = {
   title: string
@@ -7,14 +8,13 @@ export type Item = {
   done: boolean
 }
 
+async function getTasks(): Promise<Task[]> {
+  const tasks = await prisma.task.findMany()
+  return tasks
+}
+
 export async function TaskList() {
-  async function getTasks() {
-    const tasks = await prisma.task.findMany()
-
-    return tasks
-  }
-
-  const tasks = await Promise.resolve(getTasks())
+  const tasks = await getTasks()
 
   return (
     <ul className="w-full">
@@ -23,8 +23,7 @@ export async function TaskList() {
         <span className="font-bold">Description</span>
         <span className="font-bold">Done</span>
       </li>
-      {
-        tasks.map((item, index) => (
+        {tasks?.map((item, index) => (
           <ListItem key={index} {...item} />
         ))}
     </ul>
